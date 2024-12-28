@@ -40,28 +40,6 @@ export function AnalysisResults({
           </div>
           <div className='space-y-2'>
             <p className='text-sm font-medium text-muted-foreground'>
-              Mean Holdings
-            </p>
-            <p className='text-2xl font-bold'>{stats.mean.toFixed(2)}</p>
-          </div>
-          <div className='space-y-2'>
-            <p className='text-sm font-medium text-muted-foreground'>
-              Standard Deviation
-            </p>
-            <p className='text-2xl font-bold'>
-              {stats.standardDeviation.toFixed(2)}
-            </p>
-          </div>
-          <div className='space-y-2'>
-            <p className='text-sm font-medium text-muted-foreground'>
-              Selected Range
-            </p>
-            <p className='text-2xl font-bold'>
-              {stats.lowerBound.toFixed(2)} - {stats.upperBound.toFixed(2)}
-            </p>
-          </div>
-          <div className='space-y-2'>
-            <p className='text-sm font-medium text-muted-foreground'>
               Eligible Holders
             </p>
             <p className='text-2xl font-bold'>

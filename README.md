@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Token Holders Picker
 
-## Getting Started
+A Next.js application that allows you to analyze and select Solana token holders based on specific criteria. This tool helps you identify and export token holder addresses that meet your specified conditions.
 
-First, run the development server:
+## Features
+
+- 🔍 Token holder analysis based on minimum holdings
+- 💰 Automatic token decimal handling using Solana SPL Token standard
+- 📊 Filter holders by custom criteria
+- ⬇️ Export selected holder addresses
+- 🚀 Built on Solana web3.js and SPL Token libraries
+
+## Prerequisites
+
+Before running this application, you need:
+
+- Node.js 18+ or Bun runtime
+- A Helius API key (set in environment variables)
+
+## Environment Setup
+
+Create a `.env.local` file in the root directory with the following variables:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
+NEXT_PUBLIC_RPC_URL=https://api.helius-rpc.com/?api-key=
+NEXT_PUBLIC_HELIUS_API_KEY=your_helius_api_key_here
+```
+
+## Installation
+
+```bash
+# Install dependencies using bun
+bun install
+```
+
+## Development
+
+Run the development server:
+
+```bash
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Enter a valid Solana token mint address
+2. Set your minimum token holdings requirement
+3. Specify the number of holders you want to select
+4. Submit the form to analyze holders
+5. Download the list of selected holder addresses
 
-## Learn More
+## Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- Next.js 14 with App Router
+- TypeScript
+- Solana Web3.js
+- Solana SPL Token
+- Tailwind CSS
+- Shadcn UI Components
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme).
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
