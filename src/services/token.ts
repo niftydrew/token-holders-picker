@@ -1,7 +1,7 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 import { getMint } from '@solana/spl-token';
 
-const HELIUS_RPC_URL = `${process.env.NEXT_PUBLIC_RPC_URL}${process.env.NEXT_PUBLIC_HELIUS_API_KEY}`;
+const HELIUS_RPC_URL = `${process.env.NEXT_PUBLIC_RPC_URL?.toString()}${process.env.NEXT_PUBLIC_HELIUS_API_KEY?.toString()}`;
 
 const connection = new Connection(HELIUS_RPC_URL || '');
 

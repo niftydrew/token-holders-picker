@@ -1,8 +1,13 @@
 import { TokenAccountResponse } from '@/lib/types';
-import { HeliusAPIError, ValidationError, NoHoldersError, TokenAnalysisError } from '@/lib/errors';
+import {
+  HeliusAPIError,
+  ValidationError,
+  NoHoldersError,
+  TokenAnalysisError,
+} from '@/lib/errors';
 import { SOLANA_ADDRESS_REGEX } from '@/lib/constants';
 
-const HELIUS_RPC_URL = `${process.env.NEXT_PUBLIC_RPC_URL}${process.env.NEXT_PUBLIC_HELIUS_API_KEY}`;
+const HELIUS_RPC_URL = `${process.env.NEXT_PUBLIC_RPC_URL?.toString()}${process.env.NEXT_PUBLIC_HELIUS_API_KEY?.toString()}`;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
 
