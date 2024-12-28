@@ -28,6 +28,16 @@ export class NoHoldersError extends TokenAnalysisError {
   }
 }
 
+export class TimeoutError extends TokenAnalysisError {
+  constructor() {
+    super(
+      'Analysis timed out. The token has too many holders to process. Try excluding more top holders or increasing the minimum holdings.',
+      'TIMEOUT_ERROR',
+      504
+    );
+  }
+}
+
 export class InsufficientHoldersError extends TokenAnalysisError {
   constructor(available: number, requested: number) {
     super(

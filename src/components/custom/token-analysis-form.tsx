@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -50,14 +50,34 @@ export function TokenAnalysisForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [results, setResults] = useState<AnalysisResults | null>(null);
+  const [processingTime, setProcessingTime] = useState<string>();
+  const [progressStage, setProgressStage] = useState<string>('');
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+
+  useEffect(() => {
+    if (isLoading) {
+      setElapsedSeconds(0);
+      const interval = setInterval(() => {
+        setElapsedSeconds((prev) => prev + 1);
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isLoading]);
+
+  const formatElapsedTime = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       mintAddress: '',
-      minHoldings: 1,
-      numberOfHolders: 500,
-      excludeTopPercent: 5, // Default to excluding top 5%
+      minHoldings: 0,
+      numberOfHolders: 100,
+      excludeTopPercent: 1,
     },
   });
 
@@ -65,10 +85,13 @@ export function TokenAnalysisForm() {
     setIsLoading(true);
     setProgress(0);
     setResults(null);
+    setProcessingTime(undefined);
+    setProgressStage('Initializing analysis...');
 
     try {
-      console.log('Submitting form with values:', values); // Debug log
+      console.log('Submitting form with values:', values);
       setProgress(20);
+      setProgressStage('Fetching token information...');
 
       const response = await fetch('/api/analyze', {
         method: 'POST',
@@ -79,16 +102,34 @@ export function TokenAnalysisForm() {
       });
 
       setProgress(60);
+      setProgressStage('Processing token holders...');
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to analyze token holders');
+        if (response.status === 504) {
+          // Handle timeout error specifically
+          toast({
+            title: 'Analysis Timeout',
+            description: data.error,
+            variant: 'destructive',
+          });
+        } else {
+          throw new Error(data.error || 'Failed to analyze token holders');
+        }
+        return;
       }
 
-      setProgress(80);
-      setResults(data);
       setProgress(100);
+      setProgressStage('Analysis complete!');
+      const { processingTimeSeconds, ...analysisResults } = data;
+      setResults(analysisResults);
+      setProcessingTime(`${processingTimeSeconds} seconds`);
+
+      toast({
+        title: 'Analysis Complete',
+        description: 'Token holder analysis has been completed successfully.',
+      });
     } catch (error) {
       console.error('Form submission error:', error); // Debug log
       toast({
@@ -125,8 +166,8 @@ export function TokenAnalysisForm() {
   };
 
   return (
-    <div className='space-y-6'>
-      <Card className='w-full max-w-2xl mx-auto'>
+    <div className="space-y-6">
+      <Card className="w-full max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>Token Holder Analysis</CardTitle>
           <CardDescription>
@@ -137,18 +178,18 @@ export function TokenAnalysisForm() {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className='space-y-6'
+              className="space-y-6"
             >
               {/* Contract Address - Full width */}
               <FormField
                 control={form.control}
-                name='mintAddress'
+                name="mintAddress"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Contract Address</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='Enter Solana token contract address'
+                        placeholder="Enter Solana token contract address"
                         {...field}
                       />
                     </FormControl>
@@ -158,24 +199,24 @@ export function TokenAnalysisForm() {
               />
 
               {/* Grid layout for numeric inputs */}
-              <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Minimum Holdings */}
                 <FormField
                   control={form.control}
-                  name='minHoldings'
+                  name="minHoldings"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Minimum Holdings</FormLabel>
                       <FormControl>
                         <Input
-                          type='number'
+                          type="number"
                           {...field}
                           onChange={(e) =>
                             field.onChange(parseFloat(e.target.value))
                           }
                         />
                       </FormControl>
-                      <FormDescription className='text-xs'>
+                      <FormDescription className="text-xs">
                         Minimum tokens required
                       </FormDescription>
                       <FormMessage />
@@ -186,20 +227,20 @@ export function TokenAnalysisForm() {
                 {/* Exclude Top Holders */}
                 <FormField
                   control={form.control}
-                  name='excludeTopPercent'
+                  name="excludeTopPercent"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Exclude Top (%)</FormLabel>
                       <FormControl>
                         <Input
-                          type='number'
+                          type="number"
                           {...field}
                           onChange={(e) =>
                             field.onChange(parseFloat(e.target.value))
                           }
                         />
                       </FormControl>
-                      <FormDescription className='text-xs'>
+                      <FormDescription className="text-xs">
                         Exclude top % of holders
                       </FormDescription>
                       <FormMessage />
@@ -210,20 +251,20 @@ export function TokenAnalysisForm() {
                 {/* Number of Holders */}
                 <FormField
                   control={form.control}
-                  name='numberOfHolders'
+                  name="numberOfHolders"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Holders to Select</FormLabel>
                       <FormControl>
                         <Input
-                          type='number'
+                          type="number"
                           {...field}
                           onChange={(e) =>
                             field.onChange(parseInt(e.target.value))
                           }
                         />
                       </FormControl>
-                      <FormDescription className='text-xs'>
+                      <FormDescription className="text-xs">
                         Number to randomly select
                       </FormDescription>
                       <FormMessage />
@@ -233,18 +274,38 @@ export function TokenAnalysisForm() {
               </div>
 
               {isLoading && (
-                <Progress
-                  value={progress}
-                  className='w-full'
-                />
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Analyzing Token Holders</CardTitle>
+                    <CardDescription>
+                      {progressStage}
+                      {progress < 100 && (
+                        <>
+                          <span className="block mt-1 text-sm text-muted-foreground">
+                            This may take several minutes for tokens with a large number of holders.
+                            Please keep this window open.
+                          </span>
+                          <span className="block mt-1 text-sm">
+                            Time elapsed: {formatElapsedTime(elapsedSeconds)}
+                          </span>
+                        </>
+                      )}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <Progress value={progress} className="w-full" />
+                    </div>
+                  </CardContent>
+                </Card>
               )}
 
               <Button
-                type='submit'
-                className='w-full'
+                type="submit"
+                className="w-full"
                 disabled={isLoading}
               >
-                {isLoading ? 'Analyzing...' : 'Find Holders'}
+                {isLoading ? "Analyzing..." : "Find Holders"}
               </Button>
             </form>
           </Form>
@@ -253,7 +314,7 @@ export function TokenAnalysisForm() {
 
       {results && (
         <Card>
-          <CardHeader className='flex flex-row items-center justify-between'>
+          <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle>Results</CardTitle>
               <CardDescription>
@@ -263,52 +324,54 @@ export function TokenAnalysisForm() {
             <Button onClick={handleDownload}>Download Addresses</Button>
           </CardHeader>
           <CardContent>
-            <div className='grid gap-4 md:grid-cols-3'>
+            <div className="grid gap-4 md:grid-cols-3">
               <div>
-                <p className='text-sm font-medium text-muted-foreground'>
+                <p className="text-sm font-medium text-muted-foreground">
                   Total Holders
                 </p>
-                <p className='text-2xl font-bold'>
+                <p className="text-2xl font-bold">
                   {results.totalHolders.toLocaleString()}
                 </p>
               </div>
               <div>
-                <p className='text-sm font-medium text-muted-foreground'>
+                <p className="text-sm font-medium text-muted-foreground">
                   Eligible Holders
                 </p>
-                <p className='text-2xl font-bold'>
+                <p className="text-2xl font-bold">
                   {results.eligibleHolders.toLocaleString()}
                 </p>
               </div>
               <div>
-                <p className='text-sm font-medium text-muted-foreground'>
+                <p className="text-sm font-medium text-muted-foreground">
                   Selected Holders
                 </p>
-                <p className='text-2xl font-bold'>
+                <p className="text-2xl font-bold">
                   {results.selectedHolders.length.toLocaleString()}
+                </p>
+              </div>
+              <div className="md:col-span-3">
+                <p className="text-sm font-medium text-muted-foreground">
+                  Processing Time: {processingTime}
                 </p>
               </div>
             </div>
 
-            <div className='mt-6 rounded-md border'>
-              <div className='h-[400px] overflow-auto'>
-                <table className='w-full'>
-                  <thead className='sticky top-0 bg-background'>
-                    <tr className='border-b'>
-                      <th className='p-2 text-left'>Address</th>
-                      <th className='p-2 text-right'>Amount</th>
+            <div className="mt-6 rounded-md border">
+              <div className="h-[400px] overflow-auto">
+                <table className="w-full">
+                  <thead className="sticky top-0 bg-background">
+                    <tr className="border-b">
+                      <th className="p-2 text-left">Address</th>
+                      <th className="p-2 text-right">Amount</th>
                     </tr>
                   </thead>
                   <tbody>
                     {results.selectedHolders.map((holder) => (
-                      <tr
-                        key={holder.address}
-                        className='border-b'
-                      >
-                        <td className='p-2 font-mono text-sm'>
+                      <tr key={holder.address} className="border-b">
+                        <td className="p-2 font-mono text-sm">
                           {holder.address}
                         </td>
-                        <td className='p-2 text-right'>
+                        <td className="p-2 text-right">
                           {holder.amount.toFixed(2)}
                         </td>
                       </tr>

@@ -13,12 +13,14 @@ interface AnalysisResultsProps {
   stats: AnalysisStats;
   selectedHolders: TokenHolder[];
   onDownload: () => void;
+  processingTimeSeconds?: string;
 }
 
 export function AnalysisResults({
   stats,
   selectedHolders,
   onDownload,
+  processingTimeSeconds,
 }: AnalysisResultsProps) {
   return (
     <div className='space-y-6'>
@@ -27,6 +29,7 @@ export function AnalysisResults({
           <CardTitle>Analysis Results</CardTitle>
           <CardDescription>
             Statistical breakdown of token holders
+            {processingTimeSeconds && ` (processed in ${processingTimeSeconds}s)`}
           </CardDescription>
         </CardHeader>
         <CardContent className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
