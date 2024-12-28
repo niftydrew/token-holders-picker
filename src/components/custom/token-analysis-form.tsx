@@ -169,12 +169,13 @@ export function TokenAnalysisForm() {
   };
 
   return (
-    <div className="space-y-6">
-      <Card className="w-full max-w-2xl mx-auto">
+    <div className="flex">
+      <Card className="w-full max-h-fit max-w-xl mx-auto rounded-2xl bg-card p-8">
         <CardHeader>
           <CardTitle>Token Holder Analysis</CardTitle>
-          <CardDescription>
-            Select random token holders based on your criteria
+          <CardDescription className="text-muted-foreground pt-2">
+            Analyze any Solana token&apos;s holder distribution and randomly
+            select holders based on your criteria. Perfect for airdrops.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -209,7 +210,7 @@ export function TokenAnalysisForm() {
                   name="minHoldings"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Minimum Holdings</FormLabel>
+                      <FormLabel>Min Holdings</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -316,7 +317,7 @@ export function TokenAnalysisForm() {
       </Card>
 
       {results && (
-        <Card>
+        <Card className="w-full max-w-2xl mx-auto rounded-2xl bg-card p-4">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle>Results</CardTitle>
