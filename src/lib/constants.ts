@@ -21,7 +21,7 @@ export const FORM_CONSTRAINTS = {
   },
   numberOfHolders: {
     min: 1,
-    max: 10000,
+    max: 1000000,
   },
   standardDeviationRange: {
     min: 0.1,
