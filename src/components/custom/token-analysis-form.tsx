@@ -107,41 +107,44 @@ export function TokenAnalysisForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        if (response.status === 504) {
-          // Handle timeout error specifically
-          toast({
-            title: 'Analysis Timeout',
-            description: data.error,
-            variant: 'destructive',
-          });
-        } else {
-          throw new Error(data.error || 'Failed to analyze token holders');
-        }
-        return;
+        throw new Error(data.error || 'Failed to analyze token holders');
       }
 
       setProgress(100);
       setProgressStage('Analysis complete!');
       const { processingTimeSeconds, ...analysisResults } = data;
       setResults(analysisResults);
-      setProcessingTime(`${processingTimeSeconds} seconds`);
+      setProcessingTime(processingTimeSeconds);
 
       toast({
         title: 'Analysis Complete',
         description: 'Token holder analysis has been completed successfully.',
       });
     } catch (error) {
-      console.error('Form submission error:', error); // Debug log
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description:
-          error instanceof Error
-            ? error.message
-            : 'Failed to analyze token holders',
-      });
+      console.error('Form submission error:', error);
+      
+      // Handle network errors (including timeouts)
+      if (error instanceof Error && (
+        error.message === 'Failed to fetch' || 
+        error.message.includes('network') ||
+        error.message.includes('timeout')
+      )) {
+        toast({
+          title: 'Analysis Timeout',
+          description: 'Analysis timed out. The token has too many holders to process. Try excluding more top holders or increasing the minimum holdings.',
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: error instanceof Error ? error.message : 'An unexpected error occurred',
+          variant: 'destructive',
+        });
+      }
     } finally {
       setIsLoading(false);
+      setProgress(0);
+      setProgressStage('');
     }
   }
 
