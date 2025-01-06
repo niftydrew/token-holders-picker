@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -59,6 +60,7 @@
   }
 }
 
+
 @layer base {
   * {
     @apply border-border;
@@ -90,5 +92,19 @@
     -webkit-box-shadow: 0 0 0 1000px hsl(var(--background)) inset !important;
     box-shadow: 0 0 0 1000px hsl(var(--background)) inset !important;
     -webkit-text-fill-color: hsl(var(--foreground)) !important;
+  }
+}
+
+@layer components {
+  .gradient-with-noise {
+    @apply relative overflow-hidden;
+  }
+
+  .gradient-with-noise::before {
+    @apply content-[''] absolute inset-0 bg-[radial-gradient(circle_at_top_right,#fff,transparent_80%)] pointer-events-none;
+  }
+
+  .gradient-with-noise::after {
+    @apply content-[''] absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay pointer-events-none;
   }
 }
